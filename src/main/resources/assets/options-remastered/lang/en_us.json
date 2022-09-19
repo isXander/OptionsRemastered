@@ -1,0 +1,8 @@
+{
+  "options-remastered.chat.delay": "Chat Delay",
+  "options-remastered.keybind_screen.button": "Open Menu",
+  "options-remastered.formatter.seconds": "%s seconds",
+  "options-remastered.formatter.pixels": "%spx",
+  "options-remastered.formatter.hold_toggle.on": "Toggle",
+  "options-remastered.formatter.hold_toggle.off": "Hold"
+}

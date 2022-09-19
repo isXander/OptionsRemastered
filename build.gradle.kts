@@ -16,16 +16,21 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+    maven("https://maven.isxander.dev/releases")
+    maven("https://maven.isxander.dev/snapshots")
+    maven("https://maven.terraformersmc.com")
 }
 
 val minecraftVersion: String by project
 val fabricLoaderVersion: String by project
+val yaclVersion: String by project
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
-
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
+
+    modImplementation("dev.isxander:yet-another-config-lib:$yaclVersion")
 }
 
 tasks {

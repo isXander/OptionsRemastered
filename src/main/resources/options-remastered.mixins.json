@@ -1,0 +1,10 @@
+{
+  "package": "dev.isxander.optionsremastered.mixins",
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "OptionsScreenMixin",
+    "SimpleOptionAccessor"
+  ]
+}
