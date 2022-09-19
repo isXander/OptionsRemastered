@@ -1,6 +1,8 @@
 package dev.isxander.optionsremastered;
 
 import com.google.common.collect.ImmutableList;
+import dev.isxander.optionsremastered.compat.Compat;
+import dev.isxander.optionsremastered.compat.SodiumCompat;
 import dev.isxander.optionsremastered.mixins.SimpleOptionAccessor;
 import dev.isxander.yacl.api.*;
 import dev.isxander.yacl.gui.controllers.ActionController;
@@ -202,6 +204,8 @@ public class OptionsRemastered {
     }
 
     private static ConfigCategory videoOptions(Option<Double> distortionEffectScaleOption, Option<Double> fovEffectScaleOption) {
+        if (Compat.SODIUM) return SodiumCompat.getSodiumVideoOptions();
+
         boolean is64Bit = client.is64Bit();
         boolean supportsHighDistance = is64Bit && Runtime.getRuntime().maxMemory() >= 1000000000L;
 

@@ -19,6 +19,7 @@ repositories {
     maven("https://maven.isxander.dev/releases")
     maven("https://maven.isxander.dev/snapshots")
     maven("https://maven.terraformersmc.com")
+    maven("https://maven.flashyreese.me/snapshots")
 }
 
 val minecraftVersion: String by project
@@ -31,6 +32,8 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
     modImplementation("dev.isxander:yet-another-config-lib:$yaclVersion")
+
+    modCompileOnly("me.jellysquid.mods:sodium-fabric:0.4.4+build.+")
 }
 
 tasks {
