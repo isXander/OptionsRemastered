@@ -1,4 +1,4 @@
-package dev.isxander.optionsremastered;
+package dev.isxander.optionsremastered.utils;
 
 import dev.isxander.yacl.api.Option;
 import dev.isxander.yacl.api.utils.Dimension;
