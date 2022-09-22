@@ -86,6 +86,7 @@ public class OptionsRemastered {
 
         builder.option(minecraftSliderOption(options.getFov(), int.class, ValueFormatters.fov())
                 .instant(true)
+                .listener((opt, pending) -> options.write())
                 .build());
 
         if (client.world != null && client.isIntegratedServerRunning()) {
