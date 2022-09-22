@@ -20,10 +20,11 @@
   "mixins": [
     "options-remastered.mixins.json"
   ],
+  "accessWidener": "options-remastered.accesswidener",
   "depends": {
     "fabricloader": ">=0.14.0",
     "minecraft": "1.19.x",
     "java": ">=17",
-    "yet-another-config-lib": ">=1.4.0"
+    "yet-another-config-lib": ">=1.4.3"
   }
 }

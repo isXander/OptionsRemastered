@@ -5,13 +5,9 @@ import dev.isxander.optionsremastered.compat.Compat;
 import dev.isxander.optionsremastered.compat.SodiumCompat;
 import dev.isxander.optionsremastered.mixins.SimpleOptionAccessor;
 import dev.isxander.yacl.api.*;
-import dev.isxander.yacl.gui.controllers.ActionController;
-import dev.isxander.yacl.gui.controllers.BooleanController;
-import dev.isxander.yacl.gui.controllers.EnumController;
-import dev.isxander.yacl.gui.controllers.TickBoxController;
+import dev.isxander.yacl.gui.controllers.*;
 import dev.isxander.yacl.gui.controllers.slider.DoubleSliderController;
 import dev.isxander.yacl.gui.controllers.slider.FloatSliderController;
-import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,6 +18,8 @@ import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.minecraft.client.option.*;
 import net.minecraft.client.render.ChunkBuilderMode;
 import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.client.resource.language.LanguageDefinition;
+import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.network.packet.c2s.play.UpdateDifficultyC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateDifficultyLockC2SPacket;
 import net.minecraft.resource.ResourcePackProfile;
@@ -31,7 +29,9 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.world.Difficulty;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class OptionsRemastered {
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -39,20 +39,17 @@ public class OptionsRemastered {
 
     public static Screen createScreen(Screen parent) {
         Option<NarratorMode> narratorOption = minecraftOption(options.getNarrator(), NarratorMode.class)
-                .controller(EnumController::new)
+                .controller(opt -> new EnumController<>(opt, ValueFormatters.narratorMode()))
                 .build();
-        Option<Double> chatOpacityOption = minecraftOption(options.getChatOpacity(), double.class)
-                .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.chatOpacity()))
+        Option<Double> chatOpacityOption = minecraftSliderOption(options.getChatOpacity(), double.class, ValueFormatters.chatOpacity())
                 .build();
-        Option<Double> textBackgroundOpacityOption = minecraftOption(options.getTextBackgroundOpacity(), double.class)
-                .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.percent()))
+        Option<Double> textBackgroundOpacityOption = minecraftSliderOption(options.getTextBackgroundOpacity(), double.class, ValueFormatters.percent())
                 .build();
         Option<Double> chatDelayOption = minecraftOption(options.getChatDelay(), double.class)
                 .name(Text.translatable("options-remastered.chat.delay"))
-                .controller(opt -> new DoubleSliderController(opt, 0.0, 6.0, 0.1, ValueFormatters.chatDelay()))
+                .controller(opt -> new CallbackSliderController<>(opt, options.getChatDelay(), ValueFormatters.chatDelay()))
                 .build();
-        Option<Double> chatLineSpacingOption = minecraftOption(options.getChatLineSpacing(), double.class)
-                .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.percent()))
+        Option<Double> chatLineSpacingOption = minecraftSliderOption(options.getChatLineSpacing(), double.class, ValueFormatters.percent())
                 .build();
         Option<Boolean> autoJumpOption = minecraftOption(options.getAutoJump(), boolean.class)
                 .controller(TickBoxController::new)
@@ -63,11 +60,9 @@ public class OptionsRemastered {
         Option<Boolean> sprintToggledOption = minecraftOption(options.getSprintToggled(), boolean.class)
                 .controller(opt -> new BooleanController(opt, ValueFormatters.holdToggle(), false))
                 .build();
-        Option<Double> distortionEffectScaleOption = minecraftOption(options.getDistortionEffectScale(), double.class)
-                .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.percentWithOff()))
+        Option<Double> distortionEffectScaleOption = minecraftSliderOption(options.getDistortionEffectScale(), double.class, ValueFormatters.percentWithOff())
                 .build();
-        Option<Double> fovEffectScaleOption = minecraftOption(options.getFovEffectScale(), double.class)
-                .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.percentWithOff()))
+        Option<Double> fovEffectScaleOption = minecraftSliderOption(options.getFovEffectScale(), double.class, ValueFormatters.percentWithOff())
                 .build();
 
         return YetAnotherConfigLib.createBuilder()
@@ -89,8 +84,7 @@ public class OptionsRemastered {
         ConfigCategory.Builder builder = ConfigCategory.createBuilder()
                 .name(Text.translatable("options.title"));
 
-        builder.option(minecraftOption(options.getFov(), int.class)
-                .controller(opt -> new IntegerSliderController(opt, 30, 110, 1, ValueFormatters.fov()))
+        builder.option(minecraftSliderOption(options.getFov(), int.class, ValueFormatters.fov())
                 .instant(true)
                 .build());
 
@@ -188,8 +182,10 @@ public class OptionsRemastered {
         ConfigCategory.Builder builder = ConfigCategory.createBuilder()
                 .name(Text.translatable("options.sounds"));
 
+        OptionGroup.Builder groupBuilder = OptionGroup.createBuilder();
+
         for (SoundCategory soundCategory : SoundCategory.values()) {
-            builder.option(Option.createBuilder(float.class)
+            Option<Float> soundOption = Option.createBuilder(float.class)
                     .name(Text.translatable("soundCategory." + soundCategory.getName()))
                     .binding(
                             1f,
@@ -197,8 +193,15 @@ public class OptionsRemastered {
                             value -> options.setSoundVolume(soundCategory, value)
                     )
                     .controller(opt -> new FloatSliderController(opt, 0f, 1f, 0.01f, ValueFormatters.percentWithOffF()))
-                    .build());
+                    .build();
+
+            if (soundCategory == SoundCategory.MASTER)
+                builder.option(soundOption);
+            else
+                groupBuilder.option(soundOption);
         }
+
+        builder.group(groupBuilder.build());
 
         return builder.build();
     }
@@ -206,19 +209,14 @@ public class OptionsRemastered {
     private static ConfigCategory videoOptions(Option<Double> distortionEffectScaleOption, Option<Double> fovEffectScaleOption) {
         if (Compat.SODIUM) return SodiumCompat.getSodiumVideoOptions();
 
-        boolean is64Bit = client.is64Bit();
-        boolean supportsHighDistance = is64Bit && Runtime.getRuntime().maxMemory() >= 1000000000L;
-
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("options.video"))
                 .option(minecraftOption(options.getGraphicsMode(), GraphicsMode.class)
                         .controller(EnumController::new)
                         .build())
-                .option(minecraftOption(options.getViewDistance(), int.class)
-                        .controller(opt -> new IntegerSliderController(opt, 2, supportsHighDistance ? 32 : 16, 1, ValueFormatters.chunks()))
+                .option(minecraftSliderOption(options.getViewDistance(), int.class, ValueFormatters.chunks())
                         .build())
-                .option(minecraftOption(options.getSimulationDistance(), int.class)
-                        .controller(opt -> new IntegerSliderController(opt, 5, supportsHighDistance ? 32 : 16, 1, ValueFormatters.chunks()))
+                .option(minecraftSliderOption(options.getSimulationDistance(), int.class, ValueFormatters.chunks())
                         .build())
                 .option(minecraftOption(options.getChunkBuilderMode(), ChunkBuilderMode.class)
                         .controller(EnumController::new)
@@ -226,8 +224,7 @@ public class OptionsRemastered {
                 .option(minecraftOption(options.getAo(), AoMode.class)
                         .controller(EnumController::new)
                         .build())
-                .option(minecraftOption(options.getMaxFps(), int.class)
-                        .controller(opt -> new IntegerSliderController(opt, 10, 260, 10, ValueFormatters.fps()))
+                .option(minecraftSliderOption(options.getMaxFps(), int.class, ValueFormatters.fps())
                         .build())
                 .option(minecraftOption(options.getEnableVsync(), boolean.class)
                         .controller(TickBoxController::new)
@@ -235,14 +232,13 @@ public class OptionsRemastered {
                 .option(minecraftOption(options.getBobView(), boolean.class)
                         .controller(TickBoxController::new)
                         .build())
-                .option(minecraftOption(options.getGuiScale(), int.class)
-                        .controller(opt -> new IntegerSliderController(opt, 0, client.getWindow().calculateScaleFactor(0, client.forcesUnicodeFont()), 1, ValueFormatters.guiScale()))
+                .option(minecraftSliderOption(options.getGuiScale(), int.class, ValueFormatters.guiScale())
+                        .flag(MinecraftClient::onResolutionChanged)
                         .build())
                 .option(minecraftOption(options.getAttackIndicator(), AttackIndicator.class)
                         .controller(EnumController::new)
                         .build())
-                .option(minecraftOption(options.getGamma(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.gamma()))
+                .option(minecraftSliderOption(options.getGamma(), double.class, ValueFormatters.gamma())
                         .build())
                 .option(minecraftOption(options.getCloudRenderMode(), CloudRenderMode.class)
                         .controller(EnumController::new)
@@ -253,15 +249,17 @@ public class OptionsRemastered {
                 .option(minecraftOption(options.getParticles(), ParticlesMode.class)
                         .controller(EnumController::new)
                         .build())
-                .option(minecraftOption(options.getMipmapLevels(), int.class)
-                        .controller(opt -> new IntegerSliderController(opt, 0, 4, 1, ValueFormatters.mipmaps()))
+                .option(minecraftSliderOption(options.getMipmapLevels(), int.class, ValueFormatters.mipmaps())
+                        .flag(client -> {
+                            client.setMipmapLevels(options.getMipmapLevels().getValue());
+                            client.reloadResourcesConcurrently();
+                        })
                         .build())
                 .option(minecraftOption(options.getEntityShadows(), boolean.class)
                         .controller(TickBoxController::new)
                         .build())
                 .option(distortionEffectScaleOption)
-                .option(minecraftOption(options.getEntityDistanceScaling(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.5, 5.0, 0.25, ValueFormatters.percent()))
+                .option(minecraftSliderOption(options.getEntityDistanceScaling(), double.class, ValueFormatters.percent())
                         .build())
                 .option(fovEffectScaleOption)
                 .option(minecraftOption(options.getShowAutosaveIndicator(), boolean.class)
@@ -271,13 +269,6 @@ public class OptionsRemastered {
     }
 
     private static ConfigCategory controlsOptions(Option<Boolean> autoJumpOption, Option<Boolean> sneakToggledOption, Option<Boolean> sprintToggledOption) {
-        if (false) {
-            return PlaceholderCategory.createBuilder()
-                    .name(Text.of("e"))
-                    .screen((client, yaclScreen) -> new ControlsOptionsScreen(yaclScreen, options))
-                    .build();
-        }
-
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("options.controls"))
                 .option(sneakToggledOption)
@@ -285,14 +276,12 @@ public class OptionsRemastered {
                 .option(autoJumpOption)
                 .group(OptionGroup.createBuilder()
                         .name(Text.translatable("options.mouse_settings"))
-                        .option(minecraftOption(options.getMouseSensitivity(), double.class)
-                                .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.mouseSensitivity()))
+                        .option(minecraftSliderOption(options.getMouseSensitivity(), double.class, ValueFormatters.mouseSensitivity())
                                 .build())
                         .option(minecraftOption(options.getInvertYMouse(), boolean.class)
                                 .controller(TickBoxController::new)
                                 .build())
-                        .option(minecraftOption(options.getMouseWheelSensitivity(), double.class)
-                                .controller(opt -> new DoubleSliderController(opt, 0.01, 10, 0.01))
+                        .option(minecraftSliderOption(options.getMouseWheelSensitivity(), double.class, DoubleSliderController.DEFAULT_FORMATTER)
                                 .build())
                         .option(minecraftOption(options.getDiscreteMouseScroll(), boolean.class)
                                 .controller(TickBoxController::new)
@@ -305,7 +294,7 @@ public class OptionsRemastered {
                         .name(Text.translatable("controls.keybinds"))
                         .option(ButtonOption.createBuilder()
                                 .name(Text.translatable("controls.keybinds"))
-                                .action(yaclScreen -> client.setScreen(new KeybindsScreen(yaclScreen, options)))
+                                .action((yaclScreen, button) -> client.setScreen(new KeybindsScreen(yaclScreen, options)))
                                 .controller(opt -> new ActionController(opt, Text.translatable("options-remastered.keybind_screen.button")))
                                 .build())
                         .build())
@@ -313,10 +302,48 @@ public class OptionsRemastered {
     }
 
     private static ConfigCategory languageOptions() {
-        return PlaceholderCategory.createBuilder()
-                .name(Text.translatable("options.language"))
-                .screen((client, yaclScreen) -> new LanguageOptionsScreen(yaclScreen, options, client.getLanguageManager()))
-                .build();
+        ConfigCategory.Builder builder = ConfigCategory.createBuilder()
+                .name(Text.translatable("narrator.button.language"));
+
+        builder.option(minecraftOption(options.getForceUnicodeFont(), boolean.class)
+                .controller(TickBoxController::new)
+                .build());
+        builder.option(Option.createBuilder(Text.class)
+                .binding(Binding.immutable(Text.translatable("options.languageWarning")))
+                .controller(LabelController::new)
+                .build());
+
+        OptionGroup.Builder groupBuilder = OptionGroup.createBuilder();
+        LanguageManager languageManager = client.getLanguageManager();
+        List<Option<Boolean>> languageButtons = new ArrayList<>();
+        for (LanguageDefinition language : languageManager.getAllLanguages()) {
+            languageButtons.add(Option.createBuilder(boolean.class)
+                    .name(Text.of(language.toString()))
+                    .controller(TickBoxController::new)
+                    .listener((option, pendingValue) -> {
+                        if (pendingValue) {
+                            languageButtons.forEach(btn -> {
+                                if (btn != option)
+                                    btn.requestSet(false);
+                            });
+                        }
+                    })
+                    .binding(
+                            false,
+                            () -> languageManager.getLanguage().getCode().equals(language.getCode()),
+                            on -> {
+                                if (on) {
+                                    languageManager.setLanguage(language);
+                                    options.language = language.getCode();
+                                    client.reloadResources();
+                                }
+                            }
+                    )
+                    .build());
+        }
+        groupBuilder.options(languageButtons);
+        builder.group(groupBuilder.build());
+        return builder.build();
     }
 
     private static ConfigCategory chatOptions(Option<NarratorMode> narratorModeOption, Option<Double> textBackgroundOpacityOption, Option<Double> chatOpacityOption, Option<Double> chatDelayOption, Option<Double> chatLineSpacingOption) {
@@ -336,19 +363,15 @@ public class OptionsRemastered {
                         .build())
                 .option(chatOpacityOption)
                 .option(textBackgroundOpacityOption)
-                .option(minecraftOption(options.getChatScale(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.percent()))
+                .option(minecraftSliderOption(options.getChatScale(), double.class, ValueFormatters.percent())
                         .build())
                 .option(chatLineSpacingOption)
                 .option(chatDelayOption)
-                .option(minecraftOption(options.getChatWidth(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.chatWidth()))
+                .option(minecraftSliderOption(options.getChatWidth(), double.class, ValueFormatters.chatWidth())
                         .build())
-                .option(minecraftOption(options.getChatHeightFocused(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.chatHeight()))
+                .option(minecraftSliderOption(options.getChatHeightFocused(), double.class, ValueFormatters.chatHeight())
                         .build())
-                .option(minecraftOption(options.getChatHeightUnfocused(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.chatHeight()))
+                .option(minecraftSliderOption(options.getChatHeightUnfocused(), double.class, ValueFormatters.chatHeight())
                         .build())
                 .option(narratorModeOption)
                 .option(minecraftOption(options.getAutoSuggestions(), boolean.class)
@@ -421,8 +444,7 @@ public class OptionsRemastered {
                 .option(minecraftOption(options.getHideLightningFlashes(), boolean.class)
                         .controller(TickBoxController::new)
                         .build())
-                .option(minecraftOption(options.getDarknessEffectScale(), double.class)
-                        .controller(opt -> new DoubleSliderController(opt, 0.0, 1.0, 0.01, ValueFormatters.percentWithOff()))
+                .option(minecraftSliderOption(options.getDarknessEffectScale(), double.class, ValueFormatters.percentWithOff())
                         .build())
                 .build();
     }
@@ -438,6 +460,11 @@ public class OptionsRemastered {
                 .name(accessor.getText())
                 .tooltip(value -> convertOrderedTextList(accessor.getTooltipFactoryGetter().apply(client).apply(value)))
                 .binding(Binding.minecraft(minecraftOption));
+    }
+
+    private static <T extends Number> Option.Builder<T> minecraftSliderOption(SimpleOption<T> minecraftOption, Class<T> typeClass, Function<T, Text> valueFormatter) {
+        return minecraftOption(minecraftOption, typeClass)
+                .controller(opt -> new CallbackSliderController<>(opt, minecraftOption, valueFormatter));
     }
 
     private static Text convertOrderedTextList(List<OrderedText> list) {

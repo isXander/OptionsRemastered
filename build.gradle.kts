@@ -22,6 +22,10 @@ repositories {
     maven("https://maven.flashyreese.me/snapshots")
 }
 
+loom {
+    accessWidenerPath.set(file("src/main/resources/options-remastered.accesswidener"))
+}
+
 val minecraftVersion: String by project
 val fabricLoaderVersion: String by project
 val yaclVersion: String by project

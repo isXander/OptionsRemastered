@@ -1,19 +1,28 @@
 package dev.isxander.optionsremastered;
 
+import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.option.NarratorMode;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
 import java.util.function.Function;
 
 class ValueFormatters {
+    private static final MinecraftClient client = MinecraftClient.getInstance();
+
+    static Function<NarratorMode, Text> narratorMode() {
+        return value -> client.getNarratorManager().isActive()
+                ? value.getName()
+                : Text.translatable("options.narrator.notavailable");
+    }
+
     static Function<Integer, Text> fov() {
-        return value -> {
-            if (value == 70)
-                return Text.translatable("options.fov.min");
-            if (value == 110)
-                return Text.translatable("options.fov.max");
-            return Text.of(Integer.toString(value));
+        return value -> switch (value) {
+            case 70 -> Text.translatable("options.fov.min");
+            case 110 -> Text.translatable("options.fov.max");
+            default -> IntegerSliderController.DEFAULT_FORMATTER.apply(value);
         };
     }
 
@@ -37,14 +46,12 @@ class ValueFormatters {
         return value -> {
             int percent = (int)(value * 100.0);
 
-            if (percent == 0)
-                return Text.translatable("options.gamma.min");
-            if (percent == 50)
-                return Text.translatable("options.gamma.default");
-            if (percent == 100)
-                return Text.translatable("options.gamma.max");
-
-            return Text.of(Integer.toString(percent));
+            return switch (percent) {
+                case 0 -> Text.translatable("options.gamma.min");
+                case 50 -> Text.translatable("options.gamma.default");
+                case 100 -> Text.translatable("options.gamma.max");
+                default -> Text.of(Integer.toString(percent));
+            };
         };
     }
 
