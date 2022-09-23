@@ -4,6 +4,7 @@ import dev.isxander.yacl.gui.controllers.slider.IntegerSliderController;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.option.NarratorMode;
+import net.minecraft.client.util.Monitor;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
@@ -91,6 +92,12 @@ public class ValueFormatters {
             ? Text.translatable("options-remastered.formatter.hold_toggle.on")
             : Text.translatable("options-remastered.formatter.hold_toggle.off");
 
-
-    public static final Function<Double, Text> mouseWheelSensitivity = value -> Text.of(String.format("%.2f", Math.pow(10.0, value / 100.0)));
+    private static final Monitor monitor = client.getWindow().getMonitor();
+    public static final Function<Integer, Text> resolution = value -> {
+        if (monitor == null)
+            return Text.translatable("options.fullscreen.unavailable");
+        return value == 0
+                ? Text.translatable("options.fullscreen.current")
+                : Text.of(monitor.getVideoMode(value - 1).toString());
+    };
 }
