@@ -4,6 +4,5 @@
   "options-remastered.formatter.seconds": "%s seconds",
   "options-remastered.formatter.pixels": "%spx",
   "options-remastered.formatter.hold_toggle.on": "Toggle",
-  "options-remastered.formatter.hold_toggle.off": "Hold",
-  "options-remastered.language.button": "SET"
+  "options-remastered.formatter.hold_toggle.off": "Hold"
 }

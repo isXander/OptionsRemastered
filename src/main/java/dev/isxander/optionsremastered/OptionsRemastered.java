@@ -74,10 +74,11 @@ public class OptionsRemastered {
 
     public static <T> Option.Builder<T> minecraftOption(SimpleOption<T> minecraftOption, Class<T> typeClass) {
         SimpleOptionAccessor<T> accessor = (SimpleOptionAccessor<T>) (Object) minecraftOption;
+        SimpleOption.TooltipFactory<T> tooltipFactory = accessor.getTooltipFactoryGetter().apply(client);
 
         return Option.createBuilder(typeClass)
                 .name(accessor.getText())
-                .tooltip(value -> convertOrderedTextList(accessor.getTooltipFactoryGetter().apply(client).apply(value)))
+                .tooltip(value -> convertOrderedTextList(tooltipFactory.apply(value)))
                 .binding(Binding.minecraft(minecraftOption));
     }
 
