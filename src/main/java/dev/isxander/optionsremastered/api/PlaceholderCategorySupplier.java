@@ -1,6 +1,5 @@
 package dev.isxander.optionsremastered.api;
 
-import dev.isxander.optionsremastered.api.CategorySupplier;
 import dev.isxander.yacl.api.ConfigCategory;
 import dev.isxander.yacl.api.PlaceholderCategory;
 import net.minecraft.client.option.GameOptions;
