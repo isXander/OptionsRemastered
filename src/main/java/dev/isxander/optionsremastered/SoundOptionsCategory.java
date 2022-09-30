@@ -25,10 +25,6 @@ public class SoundOptionsCategory extends ConfigCategorySupplier {
                 .controller(opt -> new CyclingListController<>(opt, Stream.concat(Stream.of(""), MinecraftClient.getInstance().getSoundManager().getSoundDevices().stream()).toList(), ValueFormatters.SOUND_DEVICES))
                 .build());
 
-        builder.option(OptionsRemastered.minecraftOption(options.getShowSubtitles(), boolean.class)
-                .controller(TickBoxController::new)
-                .build());
-
         builder.option(OptionsRemastered.minecraftOption(options.getDirectionalAudio(), boolean.class)
                 .controller(TickBoxController::new)
                 .build());

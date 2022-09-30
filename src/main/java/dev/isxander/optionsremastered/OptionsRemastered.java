@@ -36,7 +36,7 @@ public class OptionsRemastered {
     private static final List<CategorySupplier.Supplier<?>> customSuppliers = new ArrayList<>();
 
     static {
-        if (Compat.SODIUM) VIDEO.override(new SodiumCompat.SodiumVideoOptionsCategory(), 500);
+        //if (Compat.SODIUM) VIDEO.override(new SodiumCompat.SodiumVideoOptionsCategory(), 500);
         if (Compat.LANGUAGE_RELOAD) LANGUAGE.override(new LanguageReloadCompat.LanguageReloadOptionsCategory(), 500);
     }
 
