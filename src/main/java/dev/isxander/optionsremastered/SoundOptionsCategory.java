@@ -22,7 +22,7 @@ public class SoundOptionsCategory extends ConfigCategorySupplier {
                 .name(Text.translatable("options.sounds"));
 
         builder.option(OptionsRemastered.minecraftOption(options.getSoundDevice(), String.class)
-                .controller(opt -> new CyclingListController<>(opt, Stream.concat(Stream.of(""), MinecraftClient.getInstance().getSoundManager().getSoundDevices().stream()).toList(), ValueFormatters.soundDevices))
+                .controller(opt -> new CyclingListController<>(opt, Stream.concat(Stream.of(""), MinecraftClient.getInstance().getSoundManager().getSoundDevices().stream()).toList(), ValueFormatters.SOUND_DEVICES))
                 .build());
 
         builder.option(OptionsRemastered.minecraftOption(options.getShowSubtitles(), boolean.class)
@@ -42,7 +42,7 @@ public class SoundOptionsCategory extends ConfigCategorySupplier {
                             () -> options.getSoundVolume(soundCategory),
                             value -> options.setSoundVolume(soundCategory, value)
                     )
-                    .controller(opt -> new FloatSliderController(opt, 0f, 1f, 0.01f, ValueFormatters.percentWithOffF))
+                    .controller(opt -> new FloatSliderController(opt, 0f, 1f, 0.01f, ValueFormatters.PERCENT_FLOAT_WITH_OFF))
                     .build();
 
             groupBuilder.option(soundOption);

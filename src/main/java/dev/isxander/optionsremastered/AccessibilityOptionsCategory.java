@@ -15,7 +15,7 @@ public class AccessibilityOptionsCategory extends ConfigCategorySupplier {
         return ConfigCategory.createBuilder()
                 .name(Text.translatable("options.accessibility.title"))
                 .option(OptionsRemastered.minecraftOption(options.getNarrator(), NarratorMode.class)
-                        .controller(opt -> new EnumController<>(opt, ValueFormatters.narratorMode))
+                        .controller(opt -> new EnumController<>(opt, ValueFormatters.NARRATOR_MODE))
                         .build())
                 .option(OptionsRemastered.minecraftOption(options.getShowSubtitles(), boolean.class)
                         .controller(TickBoxController::new)
@@ -23,9 +23,9 @@ public class AccessibilityOptionsCategory extends ConfigCategorySupplier {
                 .option(OptionsRemastered.minecraftOption(options.getBackgroundForChatOnly(), boolean.class)
                         .controller(TickBoxController::new)
                         .build())
-                .option(OptionsRemastered.minecraftSliderOption(options.getDistortionEffectScale(), double.class, ValueFormatters.percentWithOff)
+                .option(OptionsRemastered.minecraftSliderOption(options.getDistortionEffectScale(), double.class, ValueFormatters.PERCENT_WITH_OFF)
                         .build())
-                .option(OptionsRemastered.minecraftSliderOption(options.getFovEffectScale(), double.class, ValueFormatters.percentWithOff)
+                .option(OptionsRemastered.minecraftSliderOption(options.getFovEffectScale(), double.class, ValueFormatters.PERCENT_WITH_OFF)
                         .build())
                 .option(OptionsRemastered.minecraftOption(options.getMonochromeLogo(), boolean.class)
                         .controller(TickBoxController::new)
@@ -33,7 +33,7 @@ public class AccessibilityOptionsCategory extends ConfigCategorySupplier {
                 .option(OptionsRemastered.minecraftOption(options.getHideLightningFlashes(), boolean.class)
                         .controller(TickBoxController::new)
                         .build())
-                .option(OptionsRemastered.minecraftSliderOption(options.getDarknessEffectScale(), double.class, ValueFormatters.percentWithOff)
+                .option(OptionsRemastered.minecraftSliderOption(options.getDarknessEffectScale(), double.class, ValueFormatters.PERCENT_WITH_OFF)
                         .build());
     }
 }

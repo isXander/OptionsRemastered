@@ -4,8 +4,8 @@ import dev.isxander.optionsremastered.api.ConfigCategorySupplier;
 import dev.isxander.optionsremastered.utils.ValueFormatters;
 import dev.isxander.yacl.api.*;
 import dev.isxander.yacl.gui.controllers.ActionController;
-import dev.isxander.yacl.gui.controllers.EnumController;
 import dev.isxander.yacl.gui.controllers.TickBoxController;
+import dev.isxander.yacl.gui.controllers.cycling.EnumController;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.option.GameOptions;
@@ -20,7 +20,7 @@ public class GeneralOptionsCategory extends ConfigCategorySupplier {
         ConfigCategory.Builder builder = ConfigCategory.createBuilder()
                 .name(Text.translatable("options.title"));
 
-        builder.option(OptionsRemastered.minecraftSliderOption(options.getFov(), int.class, ValueFormatters.fov)
+        builder.option(OptionsRemastered.minecraftSliderOption(options.getFov(), int.class, ValueFormatters.FOV)
                 .instant(true)
                 .listener((opt, pending) -> options.write())
                 .build());
