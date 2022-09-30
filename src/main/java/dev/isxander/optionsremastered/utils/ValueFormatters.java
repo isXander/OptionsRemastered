@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.option.NarratorMode;
 import net.minecraft.client.util.Monitor;
+import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
@@ -100,4 +101,10 @@ public class ValueFormatters {
                 ? Text.translatable("options.fullscreen.current")
                 : Text.of(monitor.getVideoMode(value - 1).toString());
     };
+
+    public static Function<String, Text> soundDevices = value -> "".equals(value)
+            ? Text.translatable("options.audioDevice.default")
+            : value.startsWith(SoundSystem.OPENAL_SOFT_ON)
+                ? Text.of(value.substring(SoundSystem.OPENAL_SOFT_ON_LENGTH))
+                : Text.of(value);
 }
