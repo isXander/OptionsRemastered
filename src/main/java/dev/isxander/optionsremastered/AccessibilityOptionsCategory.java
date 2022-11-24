@@ -30,6 +30,8 @@ public class AccessibilityOptionsCategory extends ConfigCategorySupplier {
                                 .build())
                         .option(OptionsRemastered.minecraftSliderOption(options.getDarknessEffectScale(), double.class, ValueFormatters.PERCENT_WITH_OFF)
                                 .build())
+                        .option(OptionsRemastered.minecraftSliderOption(options.getPanoramaSpeed(), double.class, ValueFormatters.PERCENT)
+                                .build())
                         .option(OptionsRemastered.minecraftOption(options.getHideLightningFlashes(), boolean.class)
                                 .controller(TickBoxController::new)
                                 .build())

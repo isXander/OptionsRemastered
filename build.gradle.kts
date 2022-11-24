@@ -99,7 +99,7 @@ if (modrinthId.isNotEmpty()) {
         versionNumber.set("${project.version}")
         versionType.set("release")
         uploadFile.set(tasks["remapJar"])
-        gameVersions.set(listOf("1.19", "1.19.1", "1.19.2"))
+        gameVersions.set(listOf("1.19", "1.19.1", "1.19.2", "1.19.3"))
         loaders.set(listOf("fabric", "quilt"))
         changelog.set(changelogText)
         syncBodyFrom.set(file("README.md").readText())
@@ -120,6 +120,7 @@ if (hasProperty("curseforge.token") && curseforgeId.isNotEmpty()) {
             addGameVersion("1.19")
             addGameVersion("1.19.1")
             addGameVersion("1.19.2")
+            addGameVersion("1.19.3")
             addGameVersion("Fabric")
             addGameVersion("Java 17")
 
@@ -141,7 +142,7 @@ githubRelease {
     owner(split[0])
     repo(split[1])
     tagName("${project.version}")
-    targetCommitish("1.19")
+    targetCommitish("1.19.3")
     body(changelogText)
     releaseAssets(tasks["remapJar"].outputs.files)
 }
@@ -157,11 +158,11 @@ publishing {
     }
 
     repositories {
-        if (hasProperty("xander-repo.username") && hasProperty("xander-repo.password")) {
+        if (hasProperty("XANDER_MAVEN_USER") && hasProperty("XANDER_MAVEN_PASS")) {
             maven(url = "https://maven.isxander.dev/releases") {
                 credentials {
-                    username = property("xander-repo.username")?.toString()
-                    password = property("xander-repo.password")?.toString()
+                    username = property("XANDER_MAVEN_USER")?.toString()
+                    password = property("XANDER_MAVEN_PASS")?.toString()
                 }
             }
         } else {

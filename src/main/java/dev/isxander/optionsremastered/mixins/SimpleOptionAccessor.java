@@ -11,5 +11,5 @@ public interface SimpleOptionAccessor<T> {
     Text getText();
 
     @Accessor
-    SimpleOption.TooltipFactoryGetter<T> getTooltipFactoryGetter();
+    SimpleOption.TooltipFactory<T> getTooltipFactory();
 }

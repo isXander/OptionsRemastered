@@ -22,9 +22,9 @@
   ],
   "accessWidener": "options-remastered.accesswidener",
   "depends": {
-    "fabricloader": ">=0.14.0",
-    "minecraft": "1.19.x",
+    "fabricloader": ">=0.14.10",
+    "minecraft": "~1.19.3",
     "java": ">=17",
-    "yet-another-config-lib": ">=1.4.3"
+    "yet-another-config-lib": "2.x.x"
   }
 }

@@ -6,7 +6,7 @@ import dev.isxander.yacl.api.ConfigCategory;
 import dev.isxander.yacl.api.OptionGroup;
 import dev.isxander.yacl.gui.controllers.TickBoxController;
 import dev.isxander.yacl.gui.controllers.cycling.EnumController;
-import net.minecraft.client.option.ChatPreviewMode;
+//import net.minecraft.client.option.ChatPreviewMode;
 import net.minecraft.client.option.ChatVisibility;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
@@ -63,9 +63,6 @@ public class ChatOptionsCategory extends ConfigCategorySupplier {
                                 .build())
                         .build())
                 .group(OptionGroup.createBuilder()
-                        .option(OptionsRemastered.minecraftOption(options.getChatPreview(), ChatPreviewMode.class)
-                                .controller(EnumController::new)
-                                .build())
                         .option(OptionsRemastered.minecraftOption(options.getOnlyShowSecureChat(), boolean.class)
                                 .controller(TickBoxController::new)
                                 .build())

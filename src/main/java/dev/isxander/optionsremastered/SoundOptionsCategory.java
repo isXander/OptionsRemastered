@@ -36,7 +36,7 @@ public class SoundOptionsCategory extends ConfigCategorySupplier {
                     .binding(
                             1f,
                             () -> options.getSoundVolume(soundCategory),
-                            value -> options.setSoundVolume(soundCategory, value)
+                            value -> options.getSoundVolumeOption(soundCategory).setValue((double) value)
                     )
                     .controller(opt -> new FloatSliderController(opt, 0f, 1f, 0.01f, ValueFormatters.PERCENT_FLOAT_WITH_OFF))
                     .build();
