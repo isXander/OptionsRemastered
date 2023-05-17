@@ -29,10 +29,11 @@ loom {
 val minecraftVersion: String by project
 val fabricLoaderVersion: String by project
 val yaclVersion: String by project
+val yarnMappings: String by project
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings("net.fabricmc:yarn:$minecraftVersion+build.+:v2")
+    mappings("net.fabricmc:yarn:$minecraftVersion+$yarnMappings")
     modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
 
     modImplementation("dev.isxander:yet-another-config-lib:$yaclVersion")

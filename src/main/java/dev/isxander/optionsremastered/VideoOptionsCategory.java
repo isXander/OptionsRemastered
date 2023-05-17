@@ -86,9 +86,10 @@ public class VideoOptionsCategory extends ConfigCategorySupplier {
                         .option(OptionsRemastered.minecraftOption(options.getCloudRenderMode(), CloudRenderMode.class)
                                 .controller(EnumController::new)
                                 .build())
-                        .option(OptionsRemastered.minecraftOption(options.getAo(), AoMode.class)
-                                .controller(EnumController::new)
-                                .build())
+                        // TODO: Find AoMode symbol and correct it here
+                        // .option(OptionsRemastered.minecraftOption(options.getAo(), AoMode.class)
+                        //         .controller(EnumController::new)
+                        //         .build())
                         .option(OptionsRemastered.minecraftOption(options.getEntityShadows(), boolean.class)
                                 .controller(TickBoxController::new)
                                 .build())
